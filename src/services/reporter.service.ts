@@ -1,13 +1,19 @@
+import { Applicationexception } from "../common/exceptions/application.exception";
 import { NotFound } from "../common/exceptions/notFound.exception";
 import { ReporterCreateDto } from "../dtos/reporter.dto";
 import { Article } from "./repositories/domain/article";
 import { Reporter } from "./repositories/domain/reporter";
 import { IReporterRepository } from "./repositories/reporter.repository";
+import fs from 'fs';
+import path from 'path';
+import { ArticleDto, ArticleToReturnDto } from "../dtos/article.dto";
+import { IArticleRepository } from "./repositories/article.repository";
 
 export class ReporterService{
 
     constructor(
-        private readonly reporterRepository:IReporterRepository
+        private readonly reporterRepository:IReporterRepository,
+        private readonly articleRepository:IArticleRepository
     ){}
 
     public async all(): Promise<Reporter[]>{
@@ -24,12 +30,21 @@ export class ReporterService{
         return reporter as unknown as Reporter;
     }
 
-    public async findReporterArticlesBasedOnId(reporter_id:number, pageSize:number = 5, page:number = 1):Promise<Article[]>{
+    public async findReporterArticlesBasedOnId(reporter_id:number, pageSize:number = 5, page:number = 1):Promise<ArticleToReturnDto[]>{
+        //get articles without images
         const articles =  await this.reporterRepository.findReporterArticlesBasedOnId(reporter_id, pageSize, page);
-        if(articles === null){
-            throw new NotFound('Articles');
-        }
-        return articles;        
+        //Array to return with the information
+        const articlesToReturn:ArticleToReturnDto[] = [];                
+
+        //Iterates each artcile and gets each article images to be addded in the object to return
+        for(let article of articles){
+            const images = await this.articleRepository.findArticleImages(article.article_id);
+            articlesToReturn.push({
+                article: article as unknown as ArticleDto,
+                images: images
+            })
+        }           
+        return articlesToReturn;        
     }
 
     public async getCountArticlesByReporterid(reporter_id:number):Promise<number>{
@@ -37,6 +52,16 @@ export class ReporterService{
     }
 
     public async store(entry:ReporterCreateDto):Promise<void>{
+        const reporterExists = await this.reporterRepository.findByEmail(entry.email);
+
+        if(reporterExists){
+            throw new Applicationexception('Email already in use')
+        }
+
         await this.reporterRepository.store(entry as Reporter);
+    }
+
+    public async uploadReporterImage(image_name:string, reporter_id:number){
+        await this.reporterRepository.uploadReporterImage(image_name, reporter_id);
     }
 }

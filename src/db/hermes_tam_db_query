@@ -1,0 +1,138 @@
+CREATE DATABASE hermes_tam_db;
+
+use hermes_tam_db;
+
+CREATE TABLE Categories(
+	category_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	name VARCHAR(50)	
+)ENGINE= InnoDB;
+
+CREATE TABLE Reporters(
+	reporter_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	name VARCHAR(50) NOT NULL,
+	user_name VARCHAR(50) NOT NULL,
+	password VARCHAR(255) NOT NULL,
+	email VARCHAR(50) NOT NULL,
+	image VARCHAR(255),
+	biography VARCHAR(999),
+	phone VARCHAR(20)
+)ENGINE=InnoDB;
+
+CREATE TABLE Articles(
+	article_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	title VARCHAR(50) NOT NULL,
+	summary VARCHAR(255),
+	content VARCHAR(999) NOT NULL,
+	created_at DATE,
+	updated_at DATE,
+	likes INT,
+	reporter_id INT NOT NULL,
+	category_id INT NOT NULL,
+	FOREIGN KEY(reporter_id) REFERENCES Reporters(reporter_id),
+	FOREIGN KEY(category_id) REFERENCES Categories(category_id)
+)ENGINE=InnoDB;
+
+CREATE TABLE Images(
+	image_id INT PRIMARY KEY NOT NULL ,
+	name VARCHAR(255) NOT NULL,
+	article_id INT NOT NULL,
+	FOREIGN KEY(article_id) REFERENCES Articles(article_id)
+)ENGINE=InnoDB;
+
+ALTER TABLE articles ADD FULLTEXT(title, content, summary);
+
+
+INSERT INTO categories(name) VALUES('Estatal');
+INSERT INTO categories(name) VALUES('Local');
+INSERT INTO categories(name) VALUES('Nacional');
+INSERT INTO categories(name) VALUES('Regional');
+INSERT INTO categories(name) VALUES('Internacional');
+INSERT INTO categories(name) VALUES('Deporte');
+
+INSERT INTO reporters(name, user_name, password, email) VALUES('Luis Garza', 'alastor69', 'Resumiendo69%', 'alastorlml@gmail.com');
+INSERT INTO reporters(name, user_name, password, email) VALUES('Jessica Leo', 'jessyLeo', 'Jessy%', 'jessy@gmail.com');
+
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 2);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 1);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 2);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 6);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 5);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 3);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 4);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 1);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 2);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 1, 1);
+
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 2);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 1);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 2);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 6);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 5);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 3);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 4);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 1);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 2);
+INSERT INTO articles(title, summary, content, reporter_id, category_id) VALUES('Nota false', 'Contenido del epigrafo', 'Contenido de la nota', 2, 1);
+
+
+--Get reporters
+SElECT * FROM reporters;
+
+--Get reporter based on id
+SElECT * FROM reporters WHERE reporter_id = 1;
+
+--Get total articles based on reporter id
+SElECT COUNT(*) FROM  articles WHERE reporter_id = 1
+
+---Get reporter articles
+SELECT articles.article_id, articles.title, articles.summary, articles.content, articles.created_at, articles.likes, 
+categories.name as category FROM articles
+inner join categories on categories.category_id = articles.category_id WHERE articles.reporter_id = 1 ORDER BY articles.article_id DESC LIMIT 3 OFFSET 0
+
+--Get Article based on th article_id
+SELECT articles.title, articles.summary, articles.content, articles.created_at, articles.likes, 
+categories.name as category, reporters.name as reporter, reporters.reporter_id  FROM articles
+inner join categories on categories.category_id = articles.category_id
+inner join reporters on articles.reporter_id = reporters.reporter_id WHERE article_id = 1  ;
+
+--Get Article based on th article_id
+SELECT articles.article_id, articles.title, articles.summary, articles.content, articles.created_at, articles.likes, 
+categories.name as category, reporters.name as reporter, reporters.reporter_id  FROM articles
+inner join categories on categories.category_id = articles.category_id
+inner join reporters on articles.reporter_id = reporters.reporter_id ORDER BY article_id DESC LIMIT 3 OFFSET 0;
+
+--Get Images Name based on article id
+SElECT name from images WHERE article_id = 21;
+
+--Based On Category
+SELECT articles.article_id, articles.title, articles.summary, articles.content, articles.created_at, articles.likes, 
+categories.name as category, reporters.name as reporter, reporters.reporter_id  FROM articles
+inner join categories on categories.category_id = articles.category_id
+inner join reporters on articles.reporter_id = reporters.reporter_id WHERE categories.category_id = 2  ORDER BY article_id DESC LIMIT 3 OFFSET 3;
+
+--Based on Reporter
+SELECT articles.article_id, articles.category_id, articles.title, articles.summary, articles.content, articles.created_at, articles.likes, 
+categories.name as category, reporters.name as reporter, reporters.reporter_id  FROM articles
+inner join categories on categories.category_id = articles.category_id
+inner join reporters on articles.reporter_id = reporters.reporter_id WHERE reporters.reporter_id = 1 ORDER BY article_id DESC LIMIT 3 OFFSET 3;
+
+--Query on Articles
+SELECT articles.article_id, articles.category_id, articles.title, articles.summary, articles.content, articles.created_at, articles.likes, 
+categories.name as category, reporters.name as reporter, reporters.reporter_id  FROM articles
+inner join categories on categories.category_id = articles.category_id
+inner join reporters on articles.reporter_id = reporters.reporter_id WHERE MATCH(articles.title, articles.content, articles.summary) AGAINST('+miente' IN BOOLEAN MODE) ORDER BY articles.article_id DESC limit 3 offset 0;
+
+--Query on Articles with LIKE
+SELECT articles.article_id, articles.category_id, articles.title, articles.summary, articles.content, articles.created_at, articles.likes, 
+      categories.name as category, reporters.name as reporter, reporters.reporter_id  FROM articles
+      inner join categories on categories.category_id = articles.category_id
+      inner join reporters on articles.reporter_id = reporters.reporter_id WHERE articles.title LIKE '%pan%' OR articles.content LIKE '%pan%' OR articles.summary LIKE '%pan%'
+      ORDER BY articles.article_id DESC LIMIT 3 OFFSET 0
+
+
+
+SELECT COUNT(*) as Total FROM articles WHERE title LIKE '%z%' OR content LIKE '%z%';
+SELECT * FROM articles LIMIT 3 OFFSET 6
+SElECT COUNT(*) as Total FROM articles
+DELETE FROM reporters WHERE reporter_id = 4
+

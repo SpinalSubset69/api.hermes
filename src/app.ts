@@ -1,5 +1,4 @@
 import express, { Application } from "express";
-import cors from "cors";
 import loadContainer from "./container";
 import { loadControllers } from "awilix-express";
 

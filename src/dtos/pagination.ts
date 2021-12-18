@@ -1,12 +1,13 @@
 import { Article } from "../services/repositories/domain/article";
+import { ArticleToReturnDto } from "./article.dto";
 
 export class ArticlesPagination{
     count:number;
     pageSize:number;
     page:number;
-    data: Article[];
+    data: ArticleToReturnDto[];
 
-    constructor(count:number, pageSize:number, page:number, data:Article[]){
+    constructor(count:number, pageSize:number, page:number, data:ArticleToReturnDto[]){
         this.count = count;
         this.pageSize = pageSize;
         this.page = page;
@@ -14,13 +15,11 @@ export class ArticlesPagination{
     }
 }
 
-export class ArticlesPaginationParams{
-    reporter_id:number;
-    pageSize:number;
-    page:number;
+export class ArticlesPaginationParams{    
+    pageSize:number = 5;
+    page:number = 1;
 
-    constructor(reporter_id:number, pageSize:number, page:number){
-        this.reporter_id = reporter_id;
+    constructor( pageSize:number, page:number){    
         this.pageSize = pageSize;
         this.page = page;
     }
