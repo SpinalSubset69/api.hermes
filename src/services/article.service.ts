@@ -1,12 +1,29 @@
+import { NotFound } from "../common/exceptions/notFound.exception";
 import { ArticleCreateDto, ArticleDto, ArticleToReturnDto } from "../dtos/article.dto";
 import { ArticlesPagination, ArticlesPaginationParams } from "../dtos/pagination";
 import { IArticleRepository } from "./repositories/article.repository";
+import { ICategoryRepository } from "./repositories/category.repository";
 import { Article } from "./repositories/domain/article";
+import { IReporterRepository } from "./repositories/reporter.repository";
 
 export class ArticleService {
-  constructor(private readonly articleRepository: IArticleRepository) {}
+  constructor(
+    private readonly articleRepository: IArticleRepository,
+    private readonly categoryRepository: ICategoryRepository,
+    private readonly reporterRepository: IReporterRepository
+    ) {}
 
   public async store(entry: ArticleCreateDto) {
+    const category = await this.categoryRepository.findById(entry.category_id);
+    const reporter = await this.reporterRepository.findByIdWithoutArticles(entry.reporter_id);
+
+    if(!category){
+      throw new NotFound('Category');
+    }
+    
+    if(!reporter){
+      throw new NotFound('Reporter');
+    }
     await this.articleRepository.store(entry as Article);
   }
 

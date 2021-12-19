@@ -5,10 +5,11 @@ import { ArticlesPagination, ArticlesPaginationParams } from "../dtos/pagination
 import { ReporterCreateDto } from "../dtos/reporter.dto";
 import { ReporterService } from "../services/reporter.service";
 import { makeReporter } from "../util/validate/reporter.validate";
-import multer from "../common/multer/multer";
+import multer from "../middlewares/multer/multer";
 import { validateImage } from "../util/validate/image.upload.validate";
 import { FileUpload } from "../dtos/image.upload.dto";
 import { getImage } from "../util/get.image";
+import { AuthMiddleWare } from "../middlewares/auth/auth.middleware";
 
 
 @route('/reporters')
@@ -20,6 +21,7 @@ export class ReporterController extends ControllerBase{
         super();
     }
 
+    @before([AuthMiddleWare])
     @POST()
     public async StoreReporter(req:Request, res:Response){
         try{            
@@ -39,10 +41,10 @@ export class ReporterController extends ControllerBase{
     @GET()    
     public async GetReporterById(req:Request, res:Response){
         try{
-            const reporter = await this.reporterService.findByIdWithoutArticles(parseInt(req.params.id));
+            const reporter = await this.reporterService.findByIdWithoutArticles(parseInt(req.params.id));            
             res.status(200).json({
                 message: 'Reporter',
-                data: reporter
+                data: reporter  
             });
         }catch(err:any){
             this.handleException(err, res);
@@ -66,7 +68,7 @@ export class ReporterController extends ControllerBase{
         }
     }
     
-    @before([multer.single('file')])
+    @before([multer('reporters').single('file'), AuthMiddleWare])
     @route('/uploadimage/:id')    
     @POST()    
     public async UploadReporterImage(req:Request, res:Response){

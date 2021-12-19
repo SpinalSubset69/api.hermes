@@ -1,13 +1,14 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
 import { Request, Response } from "express";
 import { ControllerBase } from "../common/controllers/base.controller";
-import multer from "../common/multer/multer.articles";
+import multer from "../middlewares/multer/multer";
 import { FileUpload } from "../dtos/image.upload.dto";
 import { ArticlesPagination, ArticlesPaginationParams } from "../dtos/pagination";
 import { ArticleService } from "../services/article.service";
 import { getImage } from "../util/get.image";
 import { validateArticle } from "../util/validate/article.validate";
 import { validateImagesArray } from "../util/validate/image.upload.validate";
+import { AuthMiddleWare } from "../middlewares/auth/auth.middleware";
 
 @route('/articles')
 export class ArtcileController extends ControllerBase{
@@ -17,6 +18,7 @@ export class ArtcileController extends ControllerBase{
         super();
     }
 
+    @before([AuthMiddleWare])
     @route('/remove/:id')
     @DELETE()
     public async RemoveArticle(req:Request, res:Response){
@@ -98,11 +100,12 @@ export class ArtcileController extends ControllerBase{
         }
     }
 
+    @before([AuthMiddleWare])
     @POST()
     public async StoreArticle(req:Request, res:Response){
         try{
             const article = validateArticle(req.body);
-            this.articleService.store(article);
+            await this.articleService.store(article);
 
             res.status(200).json({
                 message: 'Article Stored Succesfully'
@@ -118,14 +121,13 @@ export class ArtcileController extends ControllerBase{
         try{
             const image_name = req.params.image;
             const image = await getImage('articles', image_name);
-
             res.status(200).sendFile(image);
         }catch(err:any){
             this.handleException(err, res); 
         }
     }
 
-    @before([multer.array('files',4)])
+    @before([multer('articles').array('files',4), AuthMiddleWare])
     @route('/uploadimages/:id')
     @POST()
     public async StoreImages(req:Request, res:Response){

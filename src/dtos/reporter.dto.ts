@@ -5,3 +5,13 @@ export interface ReporterCreateDto{
     password:string;  
     image?:string;       
 }
+
+export interface ReporterToReturnDto{
+    reporter_id: number;
+    name:string;
+    user_name:string;
+    email:string;    
+    image?:string;
+    biography?:string;
+    phone?:string;    
+}

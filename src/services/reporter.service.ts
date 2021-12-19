@@ -1,6 +1,6 @@
 import { Applicationexception } from "../common/exceptions/application.exception";
 import { NotFound } from "../common/exceptions/notFound.exception";
-import { ReporterCreateDto } from "../dtos/reporter.dto";
+import { ReporterCreateDto, ReporterToReturnDto } from "../dtos/reporter.dto";
 import { Article } from "./repositories/domain/article";
 import { Reporter } from "./repositories/domain/reporter";
 import { IReporterRepository } from "./repositories/reporter.repository";
@@ -20,14 +20,22 @@ export class ReporterService{
         return await this.reporterRepository.all();
     }
 
-    public async findByIdWithoutArticles(reporter_id:number):Promise<Reporter>{
-        const reporter=  await this.reporterRepository.findByIdWithoutArticles(reporter_id);
-
+    public async findByIdWithoutArticles(reporter_id:number):Promise<ReporterToReturnDto>{
+        const reporter=  await this.reporterRepository.findByIdWithoutArticles(reporter_id);        
         if(reporter === null){
             throw new NotFound('Reporter');
         }
+        const reporterToReturn:ReporterToReturnDto = {
+            reporter_id: reporter.reporter_id,
+            name: reporter.name,
+            user_name: reporter.user_name,
+            email: reporter.email,
+            biography: reporter.biography,
+            phone: reporter.phone,
+            image: reporter.image
+        }
 
-        return reporter as unknown as Reporter;
+        return reporterToReturn;
     }
 
     public async findReporterArticlesBasedOnId(reporter_id:number, pageSize:number = 5, page:number = 1):Promise<ArticleToReturnDto[]>{

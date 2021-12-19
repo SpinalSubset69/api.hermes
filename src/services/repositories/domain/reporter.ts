@@ -8,3 +8,8 @@ export interface Reporter{
     biography?:string;
     phone?:string;            
 }
+
+export interface ReporterLogIn{
+    email:string;
+    password:string;
+}

@@ -44,7 +44,7 @@ export class ReporterMySqlRepository implements IReporterRepository {
       .update(entry.password)
       .digest("base64");
     await connector.execute(
-      "INSERT INTO reporters(name, user_name, password, email) VALUES(?, ?, ?, ?, ?)",
+      "INSERT INTO reporters(name, user_name, password, email) VALUES(?, ?, ?, ?)",
       [entry.name, entry.user_name, hashedPassword, entry.email]
     );
   }
