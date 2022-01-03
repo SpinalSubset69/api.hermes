@@ -1,26 +1,36 @@
-import { Article } from "../services/repositories/domain/article";
-import { ArticleToReturnDto } from "./article.dto";
+import { ArticleDto } from "./article.dto";
 
-export class ArticlesPagination{
-    count:number;
-    pageSize:number;
-    page:number;
-    data: ArticleToReturnDto[];
+export class ArticlesPagination {
+  count: number;
+  pageSize: number;
+  page: number;
+  data: ArticleDto[];
 
-    constructor(count:number, pageSize:number, page:number, data:ArticleToReturnDto[]){
-        this.count = count;
-        this.pageSize = pageSize;
-        this.page = page;
-        this.data = data;
-    }
+  constructor(
+    count: number,
+    pageSize: number,
+    page: number,
+    data: ArticleDto[]
+  ) {
+    this.count = count;
+    this.pageSize = pageSize;
+    this.page = page;
+    this.data = data;
+  }
 }
 
-export class ArticlesPaginationParams{    
-    pageSize:number = 5;
-    page:number = 1;
+export class ArticlesPaginationParams {
+  pageSize: number;
+  page: number;
+  query:string;
+  category:string;
+  reporter_id:number;
 
-    constructor( pageSize:number, page:number){    
-        this.pageSize = pageSize;
-        this.page = page;
-    }
+  constructor(pageSize: number, page: number, query?:string, category?:string, reporter_id?:number) {
+    this.pageSize = pageSize ? pageSize : 3;
+    this.page = page ? page : 1;
+    this.query = query ? query : '';
+    this.category = category ? category : '';
+    this.reporter_id = reporter_id ? reporter_id : 0;
+  }
 }

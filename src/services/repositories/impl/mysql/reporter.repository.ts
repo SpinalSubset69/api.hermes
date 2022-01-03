@@ -1,10 +1,11 @@
-import { Article } from "../../domain/article";
 import { Reporter } from "../../domain/reporter";
 import { IReporterRepository } from "../../reporter.repository";
 import connector from "./../../../../common/persistance/mysql";
 import SHA from "sha.js";
 
+
 export class ReporterMySqlRepository implements IReporterRepository {
+    
   public async uploadReporterImage(
     image_name: string,
     reporter_id: number
@@ -16,29 +17,16 @@ export class ReporterMySqlRepository implements IReporterRepository {
   }
   public async findByEmail(email: string): Promise<Reporter | null> {
     const [rows]: any[] = await connector.execute(
-      "SElECT * FROM reporters WHERE email =  ?",
+      "SElECT * FROM reporters WHERE email = ?",
       [email]
-    );
-    if (rows.length) {
+    );    
+    if (rows.length) {      
       return rows[0] as Reporter;
     }
     return null;
   }
-  public async getCountArticlesByReporteridArticles(
-    reporter_id: number
-  ): Promise<number> {
-    const [rows]: any[] = await connector.execute(
-      "SElECT COUNT(*) as Total FROM  articles WHERE reporter_id = ?",
-      [reporter_id]
-    );
 
-    if (rows.length) {
-      return rows[0].Total as number;
-    }
-    return 0;
-  }
-
-  public async store(entry: Reporter): Promise<void> {
+  public async store(entry: Reporter): Promise<Reporter> {
     //hash password
     const hashedPassword = SHA("SHA256")
       .update(entry.password)
@@ -47,6 +35,8 @@ export class ReporterMySqlRepository implements IReporterRepository {
       "INSERT INTO reporters(name, user_name, password, email) VALUES(?, ?, ?, ?)",
       [entry.name, entry.user_name, hashedPassword, entry.email]
     );
+
+    return await this.findByEmail(entry.email) as Reporter;    
   }
 
   public async all(): Promise<Reporter[]> {
@@ -67,18 +57,5 @@ export class ReporterMySqlRepository implements IReporterRepository {
     }
 
     return null;
-  }
-  public async findReporterArticlesBasedOnId(
-    reporter_id: number,
-    pageSize: number = 5,
-    page: number = 1
-  ): Promise<Article[]> {
-    const [rows]: any[] = await connector.query(
-      `SELECT articles.article_id, articles.title, articles.summary, articles.content, articles.created_at, articles.likes, categories.name as category 
-      FROM articles inner join categories on categories.category_id = articles.category_id 
-      WHERE articles.reporter_id = ?  ORDER BY articles.article_id DESC LIMIT ? OFFSET ?`,
-      [reporter_id, pageSize, (page - 1) * pageSize]
-    );
-    return rows as Article[];
   }
 }

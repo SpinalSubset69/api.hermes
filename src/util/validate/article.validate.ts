@@ -18,20 +18,17 @@ function ValidateArticleinfo({
   title = RequiredParam("Title"),
   summary = RequiredParam("Summary"),
   content = RequiredParam("Content"),
-  category_id = RequiredParam("Category_Id"),
-  reporter_id = RequiredParam("Reporter_id"),
+  category_id = RequiredParam("Category_Id")  
 }: ArticleCreateDto) {
   ValidateTitle(title);
   ValidateSummary(summary);
   ValidateContent(content);
-  ValidateCategory(category_id);
-  ValidateReporter(reporter_id);
+  ValidateCategory(category_id);  
   return {
     title,
     summary,
     content,
-    category_id,
-    reporter_id,
+    category_id,    
   } as ArticleCreateDto;
 }
 
@@ -65,8 +62,3 @@ function ValidateCategory(category_id: number) {
   }
 }
 
-function ValidateReporter(reporter_id: number) {
-  if (reporter_id < 0) {
-    throw new InvalidPropertyError('Invalid reporter');
-  }
-}

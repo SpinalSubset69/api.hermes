@@ -1,60 +1,61 @@
-import assert from 'assert';
-import { ReporterCreateDto } from '../dtos/reporter.dto';
-import { ReporterService } from '../services/reporter.service';
-import { ArticleMySqlRepository } from '../services/repositories/impl/mysql/article.repository';
-import { ReporterMySqlRepository } from '../services/repositories/impl/mysql/reporter.repository';
+import assert from "assert";
+import { ReporterCreateDto } from "../dtos/reporter.dto";
+import { ReporterService } from "../services/reporter.service";
+import { ArticleMockRepository } from "../services/repositories/impl/mock/article.mock";
+import { ReporterMockRepository } from "../services/repositories/impl/mock/reporter.mock";
 
 const reporterService = new ReporterService(
-    new ReporterMySqlRepository(),
-    new ArticleMySqlRepository()
+  new ReporterMockRepository(),
+  new ArticleMockRepository()
 );
 
-describe('Reporter Service', () => {
-    describe('All Method', () => {
-        //Get All reporters
-        it('Should returns a list of reporters', async () => {
-            const data = await reporterService.all;            
-            assert(data);
-        });
-
-        //Get reporter based on id
-        it('Should returns a reporter based on the id', async () => {
-            const data = await reporterService.findByIdWithoutArticles(1); 
-            assert(data);
-        });
-
-        //Get reporter based on id with articles
-        it('Should returns a reporter articles', async () => {
-            const data = await reporterService.findReporterArticlesBasedOnId(1);
-            assert(data);
-        }); 
-
-        //Create reporter
-        /* it('Should stores a reporter on the db', async () => {
-            await reporterService.store({
-                name: 'Juan Luis',
-                password: 'Resumiendo69%',
-                email: 'alastorlml@gmail.com',
-                user_name: 'Sonic77'
-            } as ReporterCreateDto)
-        });  */
-
-          //Create reporter with an existing email
-         it('Should try to store a reporter on the db with an existing email', async () => {
-            let message;
-            try{
-                await reporterService.store({
-                    name: 'Juan Luis',
-                    password: 'Resumiendo69%',
-                    email: 'alastorlml@gmail.com',
-                    user_name: 'Sonic77'
-                } as ReporterCreateDto);
-            }catch(err:any){
-                message = err.message;
-            }
-
-            assert(message, 'Email already in use')
-        });  
-
+describe("Reporter Service", () => {
+  describe("All Method", () => {
+    //Get All reporters
+    it("Should returns a list of reporters", async () => {
+      const data = await reporterService.all();
+      console.log(data);
+      assert(data.length != 0);
     });
+
+    it("Should store a new reporter and return it with new reporter_id", async () => {
+      const newReporter: ReporterCreateDto = {
+        name: "Juan Luis",
+        user_name: "sonic",
+        email: "sonic@gmail.com",
+        password: "Resumiendo69%",
+      };
+      const storedReporter = await reporterService.store(newReporter);
+      console.log(storedReporter);
+
+      assert(storedReporter.reporter_id === 2);
+    });
+
+    it('Should store a new reporter and throw an Application Exception Exception with message "Email already in use"', async () => {
+      try {
+        const newReporter: ReporterCreateDto = {
+          name: "Juan Luis",
+          user_name: "sonic",
+          email: "alastorlml@gmail.com",
+          password: "Resumiendo69%",
+        };
+        const storedReporter = await reporterService.store(newReporter);
+      } catch (err: any) {
+        assert(err.message, "Email already in use");
+      }
+    });
+
+    it("Should returns a reporter based on the Id", async () => {
+      const reporter = await reporterService.findByIdWithoutArticles(1);
+      assert(reporter != null);
+    });
+
+    it("Should throw a NotFound exception wiht message 'Reporter Not Found'", async () => {
+      try {
+        const reporter = await reporterService.findByIdWithoutArticles(100000);
+      } catch (err: any) {
+        assert(err.message, "Reporter Not Found");
+      }
+    });
+  });
 });

@@ -34,7 +34,7 @@ export const validateImagesArray = async (
   let onlyImages = true;
   let oversize = false;
   
-  for (let image of imagesInfo) {
+  for (const image of imagesInfo) {
     const mimeType = image.mimetype.split("/")[1];
     if (
       !mimeType.includes("png") &&
@@ -52,7 +52,7 @@ export const validateImagesArray = async (
   //In case there is a different file errase everything
   if (!onlyImages || oversize) {
     console.log('NOOOO')
-    for (let image of imagesInfo) {
+    for (const image of imagesInfo) {
       //Delete image from the folder
       await fs.unlink(path.resolve(image.path), (err: any) => {
         throw new Applicationexception(err.message);

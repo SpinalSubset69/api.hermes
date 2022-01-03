@@ -1,3 +1,5 @@
+import { ArticleDto } from "./article.dto";
+
 export interface ReporterCreateDto{
     name:string;
     user_name:string;
@@ -14,4 +16,9 @@ export interface ReporterToReturnDto{
     image?:string;
     biography?:string;
     phone?:string;    
+}
+
+export interface ReporterWithArticles{
+    reporter:ReporterToReturnDto,
+    articles:ArticleDto[]
 }

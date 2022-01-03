@@ -33,7 +33,7 @@ CREATE TABLE Articles(
 )ENGINE=InnoDB;
 
 CREATE TABLE Images(
-	image_id INT PRIMARY KEY NOT NULL ,
+	image_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
 	article_id INT NOT NULL,
 	FOREIGN KEY(article_id) REFERENCES Articles(article_id)
@@ -41,6 +41,7 @@ CREATE TABLE Images(
 
 ALTER TABLE articles ADD FULLTEXT(title, content, summary);
 
+---------------------Categories---------------------
 
 INSERT INTO categories(name) VALUES('Estatal');
 INSERT INTO categories(name) VALUES('Local');
@@ -48,6 +49,8 @@ INSERT INTO categories(name) VALUES('Nacional');
 INSERT INTO categories(name) VALUES('Regional');
 INSERT INTO categories(name) VALUES('Internacional');
 INSERT INTO categories(name) VALUES('Deporte');
+
+---------------------Categories---------------------
 
 INSERT INTO reporters(name, user_name, password, email) VALUES('Luis Garza', 'alastor69', 'Resumiendo69%', 'alastorlml@gmail.com');
 INSERT INTO reporters(name, user_name, password, email) VALUES('Jessica Leo', 'jessyLeo', 'Jessy%', 'jessy@gmail.com');

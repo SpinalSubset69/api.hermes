@@ -3,13 +3,7 @@ export interface ArticleCreateDto {
   summary: string;
   content: string;
   category_id: number;
-  reporter_id: number;
   created_at?: Date;
-}
-
-export interface ArticleToReturnDto {
-  article: ArticleDto | null;
-  images: Images[] | null;
 }
 
 export interface Images {
@@ -17,6 +11,7 @@ export interface Images {
 }
 
 export interface ArticleDto {
+  article_id:number;
   title: string;
   summary: string;
   content: string;
@@ -25,4 +20,5 @@ export interface ArticleDto {
   likes?: number;
   category: string;
   reporter: string;
+  images:Images[]
 }

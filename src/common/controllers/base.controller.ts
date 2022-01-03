@@ -13,6 +13,13 @@ export abstract class ControllerBase{
         res.status(statusCode).json({
             statusCode,
             message: err.message,            
+        }); 
+    }
+
+    OkResponseWithData(statusCode:number, message:string, data:any[], res:Response){
+        res.status(statusCode).json({
+            message,
+            data
         });
     }
 }

@@ -3,7 +3,7 @@ import { ArticlesPaginationParams } from '../dtos/pagination';
 import { ArticleService } from '../services/article.service';
 import { ArticleMySqlRepository } from '../services/repositories/impl/mysql/article.repository';
 
-const articleService = new ArticleService(
+/* const articleService = new ArticleService(
     new ArticleMySqlRepository()
 )
 describe('Artcle Service', () => {
@@ -14,4 +14,4 @@ describe('Artcle Service', () => {
             assert(data);
         });
     });
-});
+}); */

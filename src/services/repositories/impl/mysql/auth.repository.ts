@@ -7,7 +7,7 @@ import SHA from "sha.js";
 export class AuthMySqlRepository implements IAuthRepository {
     public async login(entry: ReporterLogIn): Promise<Reporter | null> {
         const [rows]: any[] = await connector.execute(
-            'SELECT email, password FROM reporters WHERE email = ?',
+            'SELECT * FROM reporters WHERE email = ?',
             [entry.email]
         )
 
@@ -21,8 +21,7 @@ export class AuthMySqlRepository implements IAuthRepository {
 
         if (reporter.password !== digestedPassword) {
             return null;
-        }
-
+        }        
         return reporter;
     }
 

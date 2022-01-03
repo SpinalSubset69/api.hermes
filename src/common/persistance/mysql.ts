@@ -8,6 +8,7 @@ dotenv.config({
     path: `${__dirname}/../../../config/${process.env.APP_ENV}.env`,
   });  
 
+  
 export default createPool({
     host: process.env.db_mysql_host,
     user: process.env.db_mysql_user,

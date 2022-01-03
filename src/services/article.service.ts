@@ -1,6 +1,6 @@
 import { NotFound } from "../common/exceptions/notFound.exception";
-import { ArticleCreateDto, ArticleDto, ArticleToReturnDto } from "../dtos/article.dto";
-import { ArticlesPagination, ArticlesPaginationParams } from "../dtos/pagination";
+import { ArticleCreateDto, ArticleDto, Images } from "../dtos/article.dto";
+import {  ArticlesPaginationParams } from "../dtos/pagination";
 import { IArticleRepository } from "./repositories/article.repository";
 import { ICategoryRepository } from "./repositories/category.repository";
 import { Article } from "./repositories/domain/article";
@@ -13,10 +13,10 @@ export class ArticleService {
     private readonly reporterRepository: IReporterRepository
     ) {}
 
-  public async store(entry: ArticleCreateDto) {
+  public async store(entry: ArticleCreateDto, reporter_id:number):Promise<Article> {
     const category = await this.categoryRepository.findById(entry.category_id);
-    const reporter = await this.reporterRepository.findByIdWithoutArticles(entry.reporter_id);
-
+    const reporter = await this.reporterRepository.findByIdWithoutArticles(reporter_id);
+    
     if(!category){
       throw new NotFound('Category');
     }
@@ -24,82 +24,47 @@ export class ArticleService {
     if(!reporter){
       throw new NotFound('Reporter');
     }
-    await this.articleRepository.store(entry as Article);
+    return await this.articleRepository.store({
+      ...entry,
+      reporter_id: reporter.reporter_id,
+      category_id: category.category_id
+    } as Article);
   }
 
-  public async uploadImage(
+  public async uploadImage( 
     image_name: string,
     article_id: number
   ): Promise<void> {
     await this.articleRepository.uploadImage(image_name, article_id);
   }
 
-  public async findArticleById(article_id:number):Promise<ArticleToReturnDto>{
+  public async findArticleById(article_id:number):Promise<ArticleDto>{
       const article = await this.articleRepository.findById(article_id);
       const images = await this.articleRepository.findArticleImages(article_id);      
-      return {
-        article: article,
-        images: images
-      } as ArticleToReturnDto;
+      const articleToReturn:ArticleDto = article as unknown as ArticleDto;
+      articleToReturn.images = images as Images[];
+      return articleToReturn;
   }
 
-  public async all(pagination:ArticlesPaginationParams): Promise<ArticleToReturnDto[]>{
-    const articles = await this.articleRepository.all(pagination.pageSize, pagination.page);
-    let articlesToReturn:ArticleToReturnDto[] = [];
-    for(let article of articles){
+  public async all(pagination:ArticlesPaginationParams): Promise<ArticleDto[]>{
+    const articles = await this.articleRepository.all(pagination);
+    const articlesToReturn:ArticleDto[] = [];
+    for(const article of articles){
       const images = await this.articleRepository.findArticleImages(article.article_id);
-      
-      articlesToReturn.push({
-        article: article as unknown as  ArticleDto,
-        images: images
-      });
+      const articleToPush:ArticleDto = article as unknown as ArticleDto;
+      articleToPush.images = images as Images[];      
+      articlesToReturn.push(articleToPush);
     }
 
     return articlesToReturn;
   }
 
-  public async findByCategory(category_id:number, pagination:ArticlesPaginationParams){
-    const articles = await this.articleRepository.findByCategory(category_id,pagination.pageSize, pagination.page);
-    let articlesToReturn:ArticleToReturnDto[] = [];
-    for(let article of articles){
-      const images = await this.articleRepository.findArticleImages(article.article_id);
-      
-      articlesToReturn.push({
-        article: article as unknown as  ArticleDto,
-        images: images
-      });
-    }
-
-    return articlesToReturn;
+  public async getArticlesCountWithSpecifications(params:ArticlesPaginationParams):Promise<number>{
+    return this.articleRepository.getCountArticlesWihtSpecifications(params);
   }
-
-  public async getArticlesWithQuery(query:string, pagination:ArticlesPaginationParams){
-    const articles = await this.articleRepository.queryOnArticles(query,pagination.pageSize, pagination.page);
-    console.log(articles);
-    let articlesToReturn:ArticleToReturnDto[] = [];
-    for(let article of articles){
-      const images = await this.articleRepository.findArticleImages(article.article_id);
-      
-      articlesToReturn.push({
-        article: article as unknown as  ArticleDto,
-        images: images
-      });
-    }
-    return articlesToReturn;
-  }
-
+    
   public async remove(article_id:number):Promise<void>{
     await this.articleRepository.remove(article_id);
   }
-
-  public async getCountArticlesWithQuery(query:string):Promise<number>{
-    return await this.articleRepository.getCountArticlesWithQuery(query);
-  }
-  public async getCountArticlesbyCategory(category_id:number):Promise<number>{
-    return await this.articleRepository.getCountArticlesByCategory(category_id);
-  }
-
-  public async getCountTotalArticles():Promise<number>{
-    return await this.articleRepository.getTotalArticlesCount();
-  }
+ 
 }
